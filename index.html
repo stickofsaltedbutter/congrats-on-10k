@@ -184,6 +184,23 @@ for (let i = 0; i < 3; i++) {
     topperGroup.add(group);
 }
 
+function replaceTopperImage(index, url) {
+    const loader = new THREE.TextureLoader();
+    loader.load(url, (tex) => {
+        const topper = topperGroup.children[index].children.find(
+            c => c.geometry.type === "PlaneGeometry"
+        );
+        topper.material.map = tex;
+        topper.material.color.set(0xffffff);
+        topper.material.transparent = true;
+        topper.material.needsUpdate = true;
+    });
+}
+
+replaceTopperImage(0, "https://www.freeiconspng.com/uploads/clash-royale-png-free-vector-download-1.png");
+replaceTopperImage(1, "https://www.freeiconspng.com/uploads/clash-royale-png-free-vector-download-1.png");
+replaceTopperImage(2, "https://www.freeiconspng.com/uploads/clash-royale-png-free-vector-download-1.png");
+
 /* Lights */
 scene.add(new THREE.AmbientLight(0xffffff,0.8));
 const dirLight = new THREE.DirectionalLight(0xffffff,1.5);
