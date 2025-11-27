@@ -83,19 +83,23 @@ scene.add(cakeMesh);
 function createShellGeometry() {
     const group = new THREE.Group();
 
-    // Main mound (front rounded part)
-    const moundGeo = new THREE.SphereGeometry(0.32, 20, 20, 0, Math.PI);
-    const mound = new THREE.Mesh(moundGeo, goldMaterial);
-    mound.scale.set(1.35, 0.9, 1);
-    mound.position.set(0, 0, 0);
-    group.add(mound);
+    // --- Rounded front of shell ---
+    const frontGeo = new THREE.SphereGeometry(0.32, 32, 32);
+    const front = new THREE.Mesh(frontGeo, goldMaterial);
+    front.scale.set(1.2, 0.8, 1.2);
+    front.position.set(0, 0, 0);
+    group.add(front);
 
-    // Ridged “tail” behind the mound
-    const tailGeo = new THREE.CylinderGeometry(0.001, 0.25, 0.45, 8, 1);
+    // --- Fan tail behind shell ---
+    const tailGeo = new THREE.ConeGeometry(0.32, 0.55, 32);
     const tail = new THREE.Mesh(tailGeo, goldMaterial);
     tail.rotation.x = Math.PI / 2;
-    tail.position.set(0, 0, -0.32);
+    tail.position.set(0, 0, -0.35);
+    tail.scale.set(1.1, 0.7, 1.0);
     group.add(tail);
+
+    // Blend illusion by slightly overlapping
+    tail.position.z = -0.28;
 
     return group;
 }
