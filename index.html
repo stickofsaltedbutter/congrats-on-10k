@@ -177,35 +177,24 @@ function createConfetti() {
 for (let i = 0; i < 100; i++) createConfetti();
 
 /* TOPPERS */
+/* Horizontal Line Topper Arrangement */
 const topperGroup = new THREE.Group();
 scene.add(topperGroup);
 
-const topperAngles = [-Math.PI / 2.5, 0, Math.PI / 2.5];
-const placeholderColors = [0xff5555, 0x55ff55, 0x5555ff];
+const topperSpacing = 1.2; // adjust for spread
+const startX = -(toppers.length - 1) * topperSpacing * 0.5;
 
-for (let i = 0; i < 3; i++) {
-
-    const plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(2, 2),
-        new THREE.MeshBasicMaterial({ color: placeholderColors[i], side: THREE.DoubleSide })
+toppers.forEach((texture, i) => {
+    const topper = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.2, 1.4),
+        new THREE.MeshStandardMaterial({ map: texture, transparent: true })
     );
-    plane.position.y = 2;
+    
+    topper.position.set(startX + i * topperSpacing, cakeHeight + 1.8, 0);
+    topper.castShadow = true;
+    topperGroup.add(topper);
+});
 
-    const stick = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.05, 0.05, 2),
-        new THREE.MeshStandardMaterial({ color: 0x804000 })
-    );
-    stick.position.y = 1;
-
-    const g = new THREE.Group();
-    g.add(stick);
-    g.add(plane);
-
-    const angle = topperAngles[i];
-    g.position.set(Math.cos(angle) * cakeRadius * 0.8, cakeHeight + 0.1, Math.sin(angle) * cakeRadius * 0.8);
-
-    topperGroup.add(g);
-}
 
 /* LIGHTS */
 scene.add(new THREE.AmbientLight(0xffffff, 0.8));
