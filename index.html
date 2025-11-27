@@ -177,51 +177,55 @@ function createConfetti() {
 for (let i = 0; i < 100; i++) createConfetti();
 
 /* TOPPERS */
-/* TOPPERS - Horizontal line arrangement */
+/* TOPPERS — Horizontal Line with Images */
 const topperGroup = new THREE.Group();
 scene.add(topperGroup);
 
-// Topper image URLs
-const topperURLs = [
+const textureLoader = new THREE.TextureLoader();
+
+// Put your 3 image URLs here:
+const topperImageURLs = [
     "https://www.freeiconspng.com/uploads/clash-royale-png-free-vector-download-1.png",
     "https://www.freeiconspng.com/uploads/clash-royale-png-free-vector-download-1.png",
     "https://www.freeiconspng.com/uploads/clash-royale-png-free-vector-download-1.png"
 ];
 
-const toppers = [];
-const textureLoader = new THREE.TextureLoader();
+// Load textures
+const topperTextures = topperImageURLs.map(url => textureLoader.load(url));
 
-topperURLs.forEach(url => {
-    toppers.push(textureLoader.load(url));
-});
+// spacing between toppers
+const topperSpacing = 2.2;
 
-const topperSpacing = 2; // adjust spacing
-const startX = -(toppers.length - 1) * topperSpacing * 0.5;
+// compute horizontal start
+const startX = -(topperTextures.length - 1) * topperSpacing * 0.5;
 
-// Create the topper planes with sticks
-toppers.forEach((texture, i) => {
+topperTextures.forEach((tex, i) => {
 
-    /* ----- Stick ----- */
+    /* ---- Stick ---- */
     const stick = new THREE.Mesh(
         new THREE.CylinderGeometry(0.05, 0.05, 2),
         new THREE.MeshStandardMaterial({ color: 0x804000 })
     );
     stick.position.set(startX + i * topperSpacing, cakeHeight + 0.7, 0);
 
-    /* ----- Topper Plane ----- */
-    const topper = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.8, 2),
-        new THREE.MeshStandardMaterial({ map: texture, transparent: true })
+    /* ---- Topper Plane (image) ---- */
+    const topperPlane = new THREE.Mesh(
+        new THREE.PlaneGeometry(2, 2.2), // adjust size here
+        new THREE.MeshStandardMaterial({
+            map: tex,
+            transparent: true
+        })
     );
-    topper.position.set(startX + i * topperSpacing, cakeHeight + 2, 0);
-    topper.lookAt(camera.position);
 
-    /* Group */
-    const group = new THREE.Group();
-    group.add(stick);
-    group.add(topper);
+    topperPlane.position.set(startX + i * topperSpacing, cakeHeight + 2, 0);
+    topperPlane.lookAt(camera.position);
 
-    topperGroup.add(group);
+    /* ---- Group ---- */
+    const g = new THREE.Group();
+    g.add(stick);
+    g.add(topperPlane);
+
+    topperGroup.add(g);
 });
 
 
