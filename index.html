@@ -10,7 +10,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 250px;
+            width: 350px;
             z-index: 10;
             pointer-events: none;
         }
@@ -124,45 +124,65 @@ for(let i=0;i<100;i++) createFallingConfetti();
 const topperGroup = new THREE.Group();
 scene.add(topperGroup);
 
-const topperPositions = [
-    -Math.PI/4,
-    0,
-    Math.PI/4
+// 3 topper angles in a semicircle facing the camera
+const topperAngles = [
+    -Math.PI / 4,
+     0,
+     Math.PI / 4
 ];
 
-const topperImages = [
-    'https://www.freeiconspng.com/uploads/clash-royale-png-free-vector-download-1.png',
-    'https://www.freeiconspng.com/uploads/clash-royale-png-free-vector-download-1.png',
-    'https://www.freeiconspng.com/uploads/clash-royale-png-free-vector-download-1.png'
-    
-];
+// Placeholder materials (visible!)
+const placeholderColors = [0xff5555, 0x55ff55, 0x5555ff];
 
-topperImages.forEach((url, i) => {
-    loader.load(url, (texture)=>{
-        const geo = new THREE.PlaneGeometry(1,1);
-        const mat = new THREE.MeshBasicMaterial({map: texture, transparent:true});
-        const topperMesh = new THREE.Mesh(geo, mat);
+// SIZE of topper image
+const TOPPER_WIDTH = 2;
+const TOPPER_HEIGHT = 2;
 
-        // Stick
-        const stickGeo = new THREE.CylinderGeometry(0.05, 0.05, 2);
-        const stickMat = new THREE.MeshStandardMaterial({color:0x804000});
-        const stickMesh = new THREE.Mesh(stickGeo, stickMat);
-        stickMesh.position.y = 1;
+// Stick height
+const STICK_HEIGHT = 2;
 
-        // Group topper + stick
-        const group = new THREE.Group();
-        group.add(stickMesh);
-        topperMesh.position.y = 2;
-        group.add(topperMesh);
+for (let i = 0; i < 3; i++) {
 
-        // Position on cake in semicircle
-        const angle = topperPositions[i];
-        const radius = cakeRadius*0.7;
-        group.position.set(Math.cos(angle)*radius, cakeHeight, Math.sin(angle)*radius);
+    /* ----------- Topper Plane (placeholder square) ---------- */
+    const planeGeo = new THREE.PlaneGeometry(TOPPER_WIDTH, TOPPER_HEIGHT);
 
-        topperGroup.add(group);
+    // bright placeholders so it's impossible to miss
+    const planeMat = new THREE.MeshBasicMaterial({
+        color: placeholderColors[i],
+        side: THREE.DoubleSide
     });
-});
+
+    const topperPlane = new THREE.Mesh(planeGeo, planeMat);
+    topperPlane.position.y = STICK_HEIGHT;   // sits on top of stick
+    topperPlane.lookAt(camera.position);     // always faces viewer
+
+    /* ----------- Stick ------------ */
+    const stickGeo = new THREE.CylinderGeometry(0.05, 0.05, STICK_HEIGHT);
+    const stickMat = new THREE.MeshStandardMaterial({ color: 0x804000 });
+    const stick = new THREE.Mesh(stickGeo, stickMat);
+
+    stick.position.y = STICK_HEIGHT / 2;
+
+    /* ----------- Group topper + stick ----------- */
+    const group = new THREE.Group();
+    group.add(stick);
+    group.add(topperPlane);
+
+    /* ----------- Position on cake (semicircle) ----------- */
+    const angle = topperAngles[i];
+    const radius = cakeRadius * 0.8;
+
+    group.position.set(
+        Math.cos(angle) * radius,
+        cakeHeight + 0.1,   // slightly above frosting
+        Math.sin(angle) * radius
+    );
+
+    // tilt slightly toward the viewer for cuteness
+    group.rotation.y = -angle;
+
+    topperGroup.add(group);
+}
 
 /* Lights */
 scene.add(new THREE.AmbientLight(0xffffff,0.8));
