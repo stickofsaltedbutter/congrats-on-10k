@@ -102,26 +102,22 @@ function createShellGeometry() {
 
     
 /* Top Shell Border */
-const topShells = new THREE.Group();
-scene.add(topShells);
+const topBorder = new THREE.Group();
+scene.add(topBorder);
 
-const topCount = 36;
-
-for (let i = 0; i < topCount; i++) {
-    const angle = (i / topCount) * Math.PI * 2;
+const count = 34;
+for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2;
     const x = Math.cos(angle) * cakeRadius * 0.92;
     const z = Math.sin(angle) * cakeRadius * 0.92;
 
-    const shellGeo = createShellGeometry(0.55, 0.38, 0.55);
-    const shell = new THREE.Mesh(shellGeo, goldMaterial);
+    const s = createShellGeometry();
+    s.position.set(x, cakeHeight + 0.1, z);
 
-    shell.position.set(x, cakeHeight + 0.02, z);
+    // Make it face outward around the circle
+    s.lookAt(0, cakeHeight + 0.1, 0);
 
-    // Make it face outward
-    shell.lookAt(0, cakeHeight + 0.02, 0);
-    shell.rotateX(Math.PI / 2);
-
-    topShells.add(shell);
+    topBorder.add(s);
 }
 
 
