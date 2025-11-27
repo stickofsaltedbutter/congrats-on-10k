@@ -81,22 +81,24 @@ cakeMesh.position.y = cakeHeight / 2;
 scene.add(cakeMesh);
 
 /* TOP BORDER */
-const borderGroup = new THREE.Group();
-scene.add(borderGroup);
 
-const borderCount = 32;
-for (let i = 0; i < borderCount; i++) {
-    const angle = (i / borderCount) * Math.PI * 2;
-    const x = Math.cos(angle) * cakeRadius * 0.95;
-    const z = Math.sin(angle) * cakeRadius * 0.95;
+const topRosettes = new THREE.Group();
+scene.add(topRosettes);
 
-    const geo = new THREE.TorusKnotGeometry(0.32, 0.14, 64, 12, 2, 3);
-    const mat = new THREE.MeshStandardMaterial({ color: 0xFFD700, metalness: 0.4, roughness: 0.3 });
+const topCount = 22;
 
-    const blob = new THREE.Mesh(geo, mat);
-    blob.position.set(x, cakeHeight + 0.1, z);
+for (let i = 0; i < topCount; i++) {
+    const angle = (i / topCount) * Math.PI * 2;
+    const x = Math.cos(angle) * cakeRadius * 0.92;
+    const z = Math.sin(angle) * cakeRadius * 0.92;
 
-    borderGroup.add(blob);
+    const rosetteGeo = createRosette(0.35, 0.18, 3.2);
+    const rosette = new THREE.Mesh(rosetteGeo, goldMaterial);
+
+    rosette.position.set(x, cakeHeight + 0.08, z);
+    rosette.lookAt(0, cakeHeight + 0.08, 0);
+
+    topRosettes.add(rosette);
 }
 
 /* BOTTOM BORDER */
