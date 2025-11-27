@@ -80,6 +80,31 @@ const cakeMesh = new THREE.Mesh(
 cakeMesh.position.y = cakeHeight / 2;
 scene.add(cakeMesh);
 
+function createRosette(radius = 0.28, height = 0.20, turns = 2.8, segments = 80) {
+    const shape = new THREE.Shape();
+    const r = radius * 0.55;
+
+    // small round shape (like icing tip)
+    shape.absarc(0, 0, r, 0, Math.PI * 2);
+
+    const path = new THREE.Curve();
+    path.getPoint = function (t) {
+        const angle = t * Math.PI * 2 * turns;
+        return new THREE.Vector3(
+            Math.cos(angle) * radius * t,
+            height * t,
+            Math.sin(angle) * radius * t
+        );
+    };
+
+    return new THREE.ExtrudeGeometry(shape, {
+        steps: segments,
+        extrudePath: path,
+        bevelEnabled: false
+    });
+}
+
+    
 /* TOP BORDER */
 
 const topRosettes = new THREE.Group();
