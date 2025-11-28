@@ -235,30 +235,8 @@ for (let i = 0; i < 40; i++) {
 const fontLoader = new FontLoader();
 fontLoader.load("Clash_Regular.json", font => {
 
-    /* -------------- FIX FONT WINDING -------------- */
-    if (font.data.glyphs) {
-        Object.keys(font.data.glyphs).forEach(key => {
-            const g = font.data.glyphs[key];
-            if (!g.o) return;
-
-            const parts = g.o.split(" ");
-            let path = [];
-            let sub = [];
-
-            parts.forEach(p => {
-                sub.push(p);
-                if (p === "z") {
-                    // complete subpath
-                    sub.reverse(); // reverse order to correct winding
-                    path.push(sub);
-                    sub = [];
-                }
-            });
-
-            g.o = path.map(p => p.join(" ")).join(" ");
-        });
-    }
-    /* -------------- FIX ----------------------- */
+    // --- APPLY NEW WINDING FIX ---
+    fixWinding(font);
 
     const textGeo = new TextGeometry("CONGRATS ON 10,000!!!", {
         font,
@@ -277,7 +255,6 @@ fontLoader.load("Clash_Regular.json", font => {
     textMesh.position.y = cakeHeight + 3.5;
     scene.add(textMesh);
 });
-
 
 /* CONFETTI */
 const confettiGroup = new THREE.Group();
