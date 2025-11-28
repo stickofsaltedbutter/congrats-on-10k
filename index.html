@@ -177,7 +177,12 @@ fontLoader.load("Clash_Regular.json", font => {
     });
     textGeo.center();
 
-    const textMesh = new THREE.Mesh(textGeo, goldMaterial);
+    const textMaterial = new THREE.MeshStandardMaterial({
+    color: 0xFFD700,   // gold color
+    metalness: 0.1,    // reduce metallic reflectivity
+    roughness: 0.4
+});
+const textMesh = new THREE.Mesh(textGeo, textMaterial);
     textMesh.position.y = cakeHeight + 3.5;
     scene.add(textMesh);
 });
