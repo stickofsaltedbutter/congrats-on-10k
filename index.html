@@ -176,34 +176,50 @@ for (let i = 0; i < 40; i++) {
 /* FLOATING TEXT */
 const fontLoader = new FontLoader();
 fontLoader.load("Clash_Regular.json", font => {
+
+    /* -------------- FIX FONT WINDING -------------- */
+    if (font.data.glyphs) {
+        Object.keys(font.data.glyphs).forEach(key => {
+            const g = font.data.glyphs[key];
+            if (!g.o) return;
+
+            const parts = g.o.split(" ");
+            let path = [];
+            let sub = [];
+
+            parts.forEach(p => {
+                sub.push(p);
+                if (p === "z") {
+                    // complete subpath
+                    sub.reverse(); // reverse order to correct winding
+                    path.push(sub);
+                    sub = [];
+                }
+            });
+
+            g.o = path.map(p => p.join(" ")).join(" ");
+        });
+    }
+    /* -------------- FIX ----------------------- */
+
     const textGeo = new TextGeometry("CONGRATS ON 10,000!!!", {
         font,
         size: 0.8,
-        height: 0.4,
+        height: 0.35,
         bevelEnabled: true,
         bevelThickness: 0.06,
-        bevelSize: 0.03,
+        bevelSize: 0.04,
         bevelSegments: 3
     });
 
     textGeo.center();
-
-    // IMPORTANT FIX FOR INVISIBLE / REVERSED LETTERS
     textGeo.computeVertexNormals(true);
 
-    const textMesh = new THREE.Mesh(
-        textGeo,
-        new THREE.MeshStandardMaterial({
-            color: 0xFFD700,
-            metalness: 0.1,
-            roughness: 0.45,
-            side: THREE.DoubleSide
-        })
-    );
-
+    const textMesh = new THREE.Mesh(textGeo, goldMaterial);
     textMesh.position.y = cakeHeight + 3.5;
     scene.add(textMesh);
 });
+
 
 /* CONFETTI */
 const confettiGroup = new THREE.Group();
