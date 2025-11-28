@@ -114,7 +114,13 @@ controls.enableDamping = true;
 
 /* Materials */
 const blueMaterial = new THREE.MeshStandardMaterial({ color: 0x228BEE, roughness: 0.4, metalness: 0.3 });
-const goldMaterial = new THREE.MeshStandardMaterial({ color: 0xFFD700, metalness: 1, roughness: 0.3 });
+const goldMaterial = new THREE.MeshStandardMaterial({
+    color: 0xFFD700,
+    metalness: 0.1,       // MUCH lower
+    roughness: 0.45,      // softer reflection
+    side: THREE.DoubleSide // << fixes invisible letters
+});
+
 
 const cakeHeight = 3;
 const cakeRadius = 3;
