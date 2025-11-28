@@ -14,8 +14,6 @@
             z-index: 10;
             pointer-events: none;
         }
-
-        /* Play Button */
         #playBtn {
             position: fixed;
             top: 10px;
@@ -35,7 +33,6 @@
 
 <img id="bottomGif" src="https://media.tenor.com/j_MxsHf3fXIAAAAM/clash-royale-clash-mini.gif">
 
-<!-- Play Music Button -->
 <button id="playBtn">Play Music</button>
 
 <script type="importmap">
@@ -73,53 +70,34 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, 8, 15);
 camera.lookAt(0, 4, 0);
 
-<button id="playBtn" style="
-    position: fixed;
-    top: 10px;       /* distance from top */
-    left: 10px;      /* distance from left */
-    z-index: 100;
-    padding: 8px 16px;
-    font-size: 14px;
-    background-color: #ffd700;
-    color: #222;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-">Play Music</button>
-
-    
-/* AUDIO!! */
+/* AUDIO SETUP */
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
 const sound = new THREE.Audio(listener);
 const audioLoader = new THREE.AudioLoader();
-
 audioLoader.load('Celebration.mp3', buffer => {
     sound.setBuffer(buffer);
     sound.setLoop(true);
     sound.setVolume(0.45);
 });
 
+const playBtn = document.getElementById('playBtn');
 function startAudio() {
     if (!sound.isPlaying) sound.play();
-    playBtn.style.display = 'none'; // hide button once playing
+    playBtn.style.display = 'none';
     window.removeEventListener('click', startAudio);
     window.removeEventListener('touchstart', startAudio);
 }
-
-const playBtn = document.getElementById('playBtn');
 playBtn.addEventListener('click', startAudio);
 window.addEventListener('click', startAudio);
 window.addEventListener('touchstart', startAudio);
 
-// Mute/unmute
+// Mute/unmute toggle
 window.addEventListener('keydown', e => {
-    if (e.key === 'm') {
-        sound.setVolume(sound.getVolume() > 0 ? 0 : 0.45);
-    }
+    if (e.key === 'm') sound.setVolume(sound.getVolume() > 0 ? 0 : 0.45);
 });
-    
+
 /* Renderer */
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -145,162 +123,98 @@ const cakeMesh = new THREE.Mesh(
 cakeMesh.position.y = cakeHeight / 2;
 scene.add(cakeMesh);
 
+/* Shells Function */
 function createShellGeometry() {
     const group = new THREE.Group();
-
-    // --- Rounded front of shell ---
     const frontGeo = new THREE.SphereGeometry(0.32, 32, 32);
     const front = new THREE.Mesh(frontGeo, goldMaterial);
     front.scale.set(1.2, 0.8, 1.2);
-    front.position.set(0, 0, 0);
     group.add(front);
 
-    // --- Fan tail behind shell ---
     const tailGeo = new THREE.ConeGeometry(0.32, 0.55, 32);
     const tail = new THREE.Mesh(tailGeo, goldMaterial);
     tail.rotation.x = Math.PI / 2;
-    tail.position.set(0, 0, -0.35);
+    tail.position.z = -0.28;
     tail.scale.set(1.1, 0.7, 1.0);
     group.add(tail);
-
-    // Blend illusion by slightly overlapping
-    tail.position.z = -0.28;
-
     return group;
 }
 
-    
 /* Top Shell Border */
 const topBorder = new THREE.Group();
 scene.add(topBorder);
-
-const count = 34;
-for (let i = 0; i < count; i++) {
-    const angle = (i / count) * Math.PI * 2;
-    const x = Math.cos(angle) * cakeRadius * 0.92;
-    const z = Math.sin(angle) * cakeRadius * 0.92;
-
+for (let i = 0; i < 34; i++) {
+    const angle = (i / 34) * Math.PI * 2;
     const s = createShellGeometry();
-    s.position.set(x, cakeHeight + 0.1, z);
-
-    // Make it face outward around the circle
+    s.position.set(Math.cos(angle) * cakeRadius * 0.92, cakeHeight + 0.1, Math.sin(angle) * cakeRadius * 0.92);
     s.lookAt(0, cakeHeight + 0.1, 0);
-
     topBorder.add(s);
 }
 
-
-/* BOTTOM BORDER */
+/* Bottom Shell Border */
 const bottomBorder = new THREE.Group();
 scene.add(bottomBorder);
-
-const bottomCount = 40;
-for (let i = 0; i < bottomCount; i++) {
-    const angle = (i / bottomCount) * Math.PI * 2;
-    const x = Math.cos(angle) * cakeRadius * 0.96;
-    const z = Math.sin(angle) * cakeRadius * 0.96;
-
+for (let i = 0; i < 40; i++) {
+    const angle = (i / 40) * Math.PI * 2;
     const s = createShellGeometry();
-    s.scale.set(1.25, 1.25, 1.25); // slightly bigger for the base
-    s.position.set(x, 0.12, z);
+    s.scale.set(1.25, 1.25, 1.25);
+    s.position.set(Math.cos(angle) * cakeRadius * 0.96, 0.12, Math.sin(angle) * cakeRadius * 0.96);
     s.lookAt(0, 0.12, 0);
-
     bottomBorder.add(s);
 }
 
-
 /* FLOATING TEXT */
 const fontLoader = new FontLoader();
-fontLoader.load(
-    "https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",
-    font => {
-        const textGeo = new TextGeometry("CONGRATS ON 10,000!!!", {
-            font: font,
-            size: 0.8,
-            height: 0.2
-        });
-        textGeo.center();
-        const textMesh = new THREE.Mesh(textGeo, goldMaterial);
-        textMesh.position.y = cakeHeight + 3.5;
-        scene.add(textMesh);
-    }
-);
+fontLoader.load("https://threejs.org/examples/fonts/helvetiker_regular.typeface.json", font => {
+    const textGeo = new TextGeometry("CONGRATS ON 10,000!!!", { font, size: 0.8, height: 0.2 });
+    textGeo.center();
+    const textMesh = new THREE.Mesh(textGeo, goldMaterial);
+    textMesh.position.y = cakeHeight + 3.5;
+    scene.add(textMesh);
+});
 
 /* CONFETTI */
 const confettiGroup = new THREE.Group();
 scene.add(confettiGroup);
-
 const confTexture = loader.load("https://event.supercell.com/clashroyale/images/landing/crown.png");
 
 function createConfetti() {
     const geo = new THREE.PlaneGeometry(0.5, 0.5);
     const mat = new THREE.MeshBasicMaterial({ map: confTexture, transparent: true });
-
     const c = new THREE.Mesh(geo, mat);
-   c.position.set(
-    (Math.random() - 0.5) * 20,  // horizontal
-    Math.random() * 10 + 5,       // vertical
-    (Math.random() - 0.5) * 20   // depth
-);
+    c.position.set((Math.random() - 0.5) * 20, Math.random() * 10 + 5, (Math.random() - 0.5) * 20);
     c.fallSpeed = Math.random() * 0.05 + 0.02;
     c.rotationSpeed = Math.random() * 0.05;
     confettiGroup.add(c);
 }
-
 for (let i = 0; i < 100; i++) createConfetti();
 
 /* TOPPERS */
-/* TOPPERS — Horizontal Line with Images */
 const topperGroup = new THREE.Group();
 scene.add(topperGroup);
-
 const textureLoader = new THREE.TextureLoader();
-
-// Put your 3 image URLs here:
 const topperImageURLs = [
     "https://cdn-assets-eu.frontify.com/s3/frontify-enterprise-files-eu/eyJwYXRoIjoic3VwZXJjZWxsXC9maWxlXC9XWG8xNXVSR2JYNWV2dWE5QzltaC5wbmcifQ:supercell:r4DzRtvyswMVOrHvTh6QiiFScO9sEMEGvYjOyyy0fGE?width=2400",
     "https://cdn-assets-eu.frontify.com/s3/frontify-enterprise-files-eu/eyJwYXRoIjoic3VwZXJjZWxsXC9maWxlXC9LbUtDQndaMnZVbnRBc2g5Z1pHTi5wbmcifQ:supercell:F_AVdzyT_vkz49YKP2EkdHIwJ2bjDARldFFA8uLb14A?width=2400",
     "https://cdn-assets-eu.frontify.com/s3/frontify-enterprise-files-eu/eyJwYXRoIjoic3VwZXJjZWxsXC9maWxlXC9qRjYzOGlIbWJpS1FFM010dlV1dC5wbmcifQ:supercell:tcrdoGKhtUxp2p_cD-6-kWmWLZ6abJ09QGu4hGhpb3k?width=2400"
 ];
-
-// Load textures
 const topperTextures = topperImageURLs.map(url => textureLoader.load(url));
-
-// spacing between toppers
 const topperSpacing = 2.2;
-
-// compute horizontal start
 const startX = -(topperTextures.length - 1) * topperSpacing * 0.5;
 
 topperTextures.forEach((tex, i) => {
-
-    /* ---- Stick ---- */
-    const stick = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.05, 0.05, 2),
-        new THREE.MeshStandardMaterial({ color: 0x804000 })
-    );
+    const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2), new THREE.MeshStandardMaterial({ color: 0x804000 }));
     stick.position.set(startX + i * topperSpacing, cakeHeight + 0.4, 0);
 
-    /* ---- Topper Plane (image) ---- */
-    const topperPlane = new THREE.Mesh(
-        new THREE.PlaneGeometry(2, 2.2), // adjust size here
-        new THREE.MeshStandardMaterial({
-            map: tex,
-            transparent: true
-        })
-    );
-
+    const topperPlane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2.2), new THREE.MeshStandardMaterial({ map: tex, transparent: true }));
     topperPlane.position.set(startX + i * topperSpacing, cakeHeight + 1.5, 0);
     topperPlane.lookAt(camera.position);
 
-    /* ---- Group ---- */
     const g = new THREE.Group();
     g.add(stick);
     g.add(topperPlane);
-
     topperGroup.add(g);
 });
-
 
 /* LIGHTS */
 scene.add(new THREE.AmbientLight(0xffffff, 0.8));
@@ -311,16 +225,12 @@ scene.add(dl);
 /* ANIMATE */
 function animate() {
     requestAnimationFrame(animate);
-
     confettiGroup.children.forEach(c => {
         c.position.y -= c.fallSpeed;
         c.rotation.x += c.rotationSpeed;
         c.rotation.y += c.rotationSpeed;
-        if (c.position.y < -1) {
-            c.position.y = Math.random() * 5 + 5;
-        }
+        if (c.position.y < -1) c.position.y = Math.random() * 10 + 5;
     });
-
     controls.update();
     renderer.render(scene, camera);
 }
