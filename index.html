@@ -200,7 +200,11 @@ function createConfetti() {
     const mat = new THREE.MeshBasicMaterial({ map: confTexture, transparent: true });
 
     const c = new THREE.Mesh(geo, mat);
-    c.position.set((Math.random() - 0.5) * 10, Math.random() * 5 + 5, (Math.random() - 0.5) * 10);
+   c.position.set(
+    (Math.random() - 0.5) * 20,  // horizontal
+    Math.random() * 10 + 5,       // vertical
+    (Math.random() - 0.5) * 20   // depth
+);
     c.fallSpeed = Math.random() * 0.05 + 0.02;
     c.rotationSpeed = Math.random() * 0.05;
     confettiGroup.add(c);
